@@ -1,32 +1,20 @@
 ---
-# TODO: re-add when updating to ansible 2.18
-#
-# - name: Skip role if not enabled
-#   ansible.builtin.meta: end_role
-#   when: not chezmoi_enable
+- name: Skip role if not enabled
+  ansible.builtin.meta: end_role
+  when: not chezmoi_enable
 
-- name: Ensure ~/.local/bin exists
-  ansible.builtin.file:
-    state: directory
-    dest: ~/.local/bin
-    mode: "0750"
-
-- name: Install chezmoi rpm package
-  vars:
-    tag: v{{ chezmoi_version }}
-    tarball: chezmoi_{{ chezmoi_version }}_linux_{{ arch_map[ansible_architecture] }}.tar.gz
-    arch_map:
-      x86_64: amd64
-      aarch64: arm64
-  ansible.builtin.unarchive:
-    remote_src: true
-    # https://github.com/twpayne/chezmoi/releases/download/v2.59.0/chezmoi_2.59.0_linux_amd64.tar.gz
-    src: https://github.com/twpayne/chezmoi/releases/download/{{ tag }}/{{ tarball }}
-    dest: ~/.local/bin
-    include: ['chezmoi']
-    creates: ~/.local/bin/chezmoi
+- name: Install chezmoi
+  become: true
+  community.general.pacman:
+    name: chezmoi
+    state: present
 
 - name: Init and apply chezmoi
   ansible.builtin.command:
-    cmd: chezmoi init --apply --ssh robert-sandor/.dotfiles --promptString "email=sandorrobertk94@gmail.com,name=Robert Sandor"
+    cmd: chezmoi init --apply --ssh robert-sandor/.dotfiles --promptDefaults
     creates: ~/.local/share/chezmoi
+
+- name: Ensure bat cache is updated
+  ansible.builtin.command:
+    cmd: bat cache --build
+  changed_when: false

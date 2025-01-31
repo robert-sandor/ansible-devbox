@@ -4,34 +4,40 @@
   ansible.builtin.hostname:
     name: devbox
 
+- name: Ensure ~/.ssh directory is present
+  ansible.builtin.file:
+    dest: ~/.ssh
+    state: directory
+    mode: "0700"
+
+- name: Ensure SSH key is present for the user
+  community.crypto.openssh_keypair:
+    path: ~/.ssh/id_ed25519
+    comment: "{{ ansible_facts.user_id }}@{{ ansible_facts.hostname }}"
+    type: ed25519
+    mode: "0600"
+
 - name: Update all packages # TODO: add a switch for this
   become: true
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest # noqa: package-latest
+  community.general.pacman:
+    upgrade: true
+    update_cache: true
 
 - name: Install essentials
   become: true
-  ansible.builtin.dnf:
+  community.general.pacman:
     state: present
     name:
+      - bat
+      - eza
+      - man-db
+      - fd
       - fish
       - fzf
+      - git
+      - git-delta
+      - lazygit
       - ripgrep
-      - fd-find
-      - zoxide
+      - starship
       - tmux
-      - neovim
-      - eza
-
-- name: Install starship copr repo
-  become: true
-  community.general.copr:
-    name: atim/starship
-    state: enabled
-
-- name: Install starship
-  become: true
-  ansible.builtin.dnf:
-    name: starship
-    state: present
+      - zoxide

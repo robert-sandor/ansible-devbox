@@ -1,11 +1,12 @@
 - name: Install neovim and some dependencies
   become: true
-  ansible.builtin.dnf:
+  community.general.pacman:
     name:
       - neovim
       - fzf
       - ripgrep
-      - fd-find
+      - fd
+      - lazygit
     state: present
 
 - name: Clone neovim configuration # noqa: latest
