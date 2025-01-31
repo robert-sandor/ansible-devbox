@@ -1,0 +1,8 @@
+- name: Setup devbox
+
+  hosts: all
+
+  roles:
+    - base
+    - neovim
+    - chezmoi

@@ -1,0 +1,4 @@
+---
+chezmoi_enable: true
+
+chezmoi_version: 2.59.0

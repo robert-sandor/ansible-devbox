@@ -1,0 +1,37 @@
+---
+- name: Set hostname
+  become: true
+  ansible.builtin.hostname:
+    name: devbox
+
+- name: Update all packages # TODO: add a switch for this
+  become: true
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest # noqa: package-latest
+
+- name: Install essentials
+  become: true
+  ansible.builtin.dnf:
+    state: present
+    name:
+      - fish
+      - fzf
+      - ripgrep
+      - fd-find
+      - zoxide
+      - tmux
+      - neovim
+      - eza
+
+- name: Install starship copr repo
+  become: true
+  community.general.copr:
+    name: atim/starship
+    state: enabled
+
+- name: Install starship
+  become: true
+  ansible.builtin.dnf:
+    name: starship
+    state: present

@@ -1,0 +1,14 @@
+- name: Install neovim and some dependencies
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - neovim
+      - fzf
+      - ripgrep
+      - fd-find
+    state: present
+
+- name: Clone neovim configuration # noqa: latest
+  ansible.builtin.git:
+    repo: git@github.com:robert-sandor/nvim.git # TODO: make variable ?
+    dest: ~/.config/nvim
